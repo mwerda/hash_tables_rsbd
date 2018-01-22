@@ -38,7 +38,7 @@ class HashTable:
         pretty_table = PrettyTable(self.column_identifiers)
         for row_name in self.row_identifiers:
             row = [row_name]
-            for column_name in self.column_identifiers:
+            for column_name in self.column_identifiers[1:]:
                 row.append(self.table[row_name][column_name])
             pretty_table.add_row(row)
         print(pretty_table)
