@@ -67,23 +67,27 @@ class GoodShit:
             winner_relation.id = winner_relation.id + '|'
 
             # Updating values
-            if iteration != 3:
-                print(winner_full_code + ' -> ' + winner_full_code.split(' ')[0] + 'I')
-                winner_relation.cardinal = semi_joins_in_iteration[winner_full_code, 'EFEKT']
-                # temp = get_sf(winner_left, winner_variable, sigmas) * get_val(self.relations, winner_right, winner_variable)
-                # val update
-                winner_relation['VAL', winner_variable] = \
-                    get_sf(winner_left, winner_variable, sigmas) * get_val(self.relations, winner_right,
-                                                                           winner_variable)
+            # if iteration != 3:
+            print(winner_full_code + ' -> ' + winner_full_code.split(' ')[0] + 'I')
+            winner_relation.cardinal = semi_joins_in_iteration[winner_full_code, 'EFEKT']
+            # temp = get_sf(winner_left, winner_variable, sigmas) * get_val(self.relations, winner_right, winner_variable)
+            # val update
+            winner_relation['VAL', winner_variable] = \
+                get_sf(winner_left, winner_variable, sigmas) * get_val(self.relations, winner_right,
+                                                                        winner_variable)
 
-                new_sigma = winner_relation.hash_table.table['VAL'][winner_variable] / self.domains[winner_variable]
+            new_sigma = winner_relation.hash_table.table['VAL'][winner_variable] / self.domains[winner_variable]
 
-            else:
+            other = list(filter(lambda x: winner_variable not in x, winner_relation.hash_table.column_identifiers[1:]))
+            print("Other variables ")
+            print(other)
+            # else:
+            for i in other:
                 # yao
                 temp_cardinal = winner_relation.cardinal
                 n = temp_cardinal
                 winner_relation.cardinal = semi_joins_in_iteration[winner_full_code, 'EFEKT']
-                m = winner_relation['VAL', 'A']
+                m = winner_relation['VAL', i]
                 r = winner_relation.cardinal
 
                 approx = 0
@@ -94,21 +98,7 @@ class GoodShit:
                 elif r >= 2 * m:
                     approx = m
 
-                winner_relation['VAL', 'A'] = approx
-
-                n = temp_cardinal
-                m = winner_relation['VAL', 'B']
-                r = winner_relation.cardinal
-
-                approx = 0
-                if r < m / 2:
-                    approx = r
-                elif m / 2 <= r < 2 * m:
-                    approx = (r + m) / 3
-                elif r >= 2 * m:
-                    approx = m
-
-                winner_relation['VAL', 'B'] = approx
+                winner_relation['VAL', i] = approx
 
             self.relations[winner_left + 'I'] = winner_relation
             for i, element in enumerate(self.sigma_attributes):
