@@ -43,6 +43,7 @@ domains = {
 
 sigma_attributes = ['R1.A', 'R2.A', 'R2.B', 'R3.B', 'R4.B']
 
+# Relacja - kolumna, ktora je laczy - relacja
 semi_joins = \
     ['R1 A R2',
      'R2 A R1',

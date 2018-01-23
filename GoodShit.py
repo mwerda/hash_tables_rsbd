@@ -31,7 +31,6 @@ class GoodShit:
                 rel_field = attribute.split('.')[1]
                 factors_population.append([self.relations[rel_id]['VAL', rel_field] / self.domains[rel_field]])
 
-                # self.relations[rel_id][attribute, 'SF'] = self.relations[rel_id]['VAL', rel_field] / in_domains[rel_field]
             sigmas.populate(factors_population)
             for element in sorted(set(x.split('.')[0] for x in self.sigma_attributes)):
                 print(self.relations[element])
@@ -44,6 +43,7 @@ class GoodShit:
                 rel_right = element.split(' ')[2]
                 variable = element.split(' ')[1]
 
+                # Breaking english naming conventions for for easy switching between test naming notion and code
                 koszt = get_size(self.relations, rel_right, variable) * get_val(self.relations, rel_right, variable)
                 efekt = get_sf(rel_right, variable, sigmas) * self.relations[rel_left].cardinal
                 if i in excluded_indexes:
@@ -73,16 +73,10 @@ class GoodShit:
                 # temp = get_sf(winner_left, winner_variable, sigmas) * get_val(self.relations, winner_right, winner_variable)
                 # val update
                 winner_relation['VAL', winner_variable] = \
-                    get_sf(winner_left, winner_variable, sigmas) * get_val(self.relations, winner_right, winner_variable)
+                    get_sf(winner_left, winner_variable, sigmas) * get_val(self.relations, winner_right,
+                                                                           winner_variable)
 
                 new_sigma = winner_relation.hash_table.table['VAL'][winner_variable] / self.domains[winner_variable]
-
-                self.relations[winner_left + 'I'] = winner_relation
-                for i, element in enumerate(self.sigma_attributes):
-                    self.sigma_attributes[i] = element.replace(winner_left, winner_left + 'I')
-
-                for i, element in enumerate(self.semi_joins):
-                    self.semi_joins[i] = element.replace(winner_left, winner_left + 'I')
 
             else:
                 # yao
@@ -116,10 +110,12 @@ class GoodShit:
 
                 winner_relation['VAL', 'B'] = approx
 
-                self.relations[winner_left + 'I'] = winner_relation
-                for i, element in enumerate(self.sigma_attributes):
-                    self.sigma_attributes[i] = element.replace(winner_left, winner_left + 'I')
+            self.relations[winner_left + 'I'] = winner_relation
+            for i, element in enumerate(self.sigma_attributes):
+                self.sigma_attributes[i] = element.replace(winner_left, winner_left + 'I')
 
+            for i, element in enumerate(self.semi_joins):
+                self.semi_joins[i] = element.replace(winner_left, winner_left + 'I')
 
             print('******************************************************************')
             print('Moving from iteration ' + str(iteration) + ' to ' + str(iteration + 1))

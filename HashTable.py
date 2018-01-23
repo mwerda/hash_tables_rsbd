@@ -1,6 +1,7 @@
 from prettytable import PrettyTable
 
 
+# Quick implementation to provide access to table's elements by pointing row's and column's names
 class HashTable:
     def __init__(self, row_identifiers, column_identifiers):
         self.row_identifiers = row_identifiers
