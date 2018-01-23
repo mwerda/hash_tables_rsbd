@@ -2,18 +2,27 @@ from prettytable import PrettyTable
 
 class Relation:
     def __init__(self, number, card):
+        self.relation_table_schema = {
+            'rows_identifiers': ['SIZE', 'VAL'],
+            'columns_identifiers': ['Property', 'A', 'B']
+        }
         self.id = number
         self.table = {}
         self.card = card
+        self.table = HashTable(self.relation_table_schema['rows_identifiers'],
+                               self.relation_table_schema['columns_identifiers'])
 
-    def build_table(self, columns, rows):
-        self.table = PrettyTable(columns)
-        for row in rows:
-            self.table.add_row(row)
+    def populate_table(self, data):
+        self.table.populate(data)
+
+    # def build_table(self, columns, rows):
+    #     self.table = PrettyTable(columns)
+    #     for row in rows:
+    #         self.table.add_row(row)
 
     def __repr__(self):
         print('R' + str(self.id))
-        print(self.table)
+        self.table.__repr__()
         print()
 
     #def get(self, row, column):
@@ -33,7 +42,6 @@ class HashTable:
             for value, column_name in zip(values_list, self.column_identifiers[1:]):
                 self.table[row_name][column_name] = value
 
-
     def __repr__(self):
         pretty_table = PrettyTable(self.column_identifiers)
         for row_name in self.row_identifiers:
@@ -44,43 +52,46 @@ class HashTable:
         print(pretty_table)
 
 
+R1 = Relation(1, 1000)
+R1.populate_table([[4, 4], [200, 50]])
+#R1.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 200, 50]])
+R1.__repr__()
 
-# R1 = Relation(1, 1000)
-# R1.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 200, 50]])
-# R1.__repr__()
-#
-# R2 = Relation(2, 1000)
-# R2.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 40, 100]])
-# R2.__repr__()
-#
-# R3 = Relation(3, 2000)
-# R3.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 400, 100]])
-# R3.__repr__()
-#
-# R4 = Relation(4, 1000)
-# R4.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 200, 50]])
-# R4.__repr__()
-#
-# in_domains = {
-#     'A': 400,
-#     'B': 500
-# }
-#
-# in_attributes = ['R1.A', 'R2.A', 'R2.B', 'R3.B', 'R4.B']
+R2 = Relation(2, 1000)
+R2.populate_table([[4, 4], [40, 100]])
+#R2.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 40, 100]])
+R2.__repr__()
+
+R3 = Relation(3, 2000)
+R3.populate_table([[4, 4], [400, 100]])
+#R3.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 400, 100]])
+R3.__repr__()
+
+R4 = Relation(4, 1000)
+R4.populate_table([[4, 4], [200, 50]])
+#R4.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 200, 50]])
+R4.__repr__()
+
+in_domains = {
+    'A': 400,
+    'B': 500
+}
+
+in_attributes = ['R1.A', 'R2.A', 'R2.B', 'R3.B', 'R4.B']
 
 #######################
 
-table = {}
-rows = ['SIZE', 'VAL']
-columns = ['Property', 'A', 'B']
-data = [
-    [4, 4],
-    [40, 100]
-]
-hash_table = HashTable(rows, columns)
-hash_table.populate(data)
-hash_table.__repr__()
-print()
+# table = {}
+# rows = ['SIZE', 'VAL']
+# columns = ['Property', 'A', 'B']
+# data = [
+#     [4, 4],
+#     [40, 100]
+# ]
+# hash_table = HashTable(rows, columns)
+# hash_table.populate(data)
+# hash_table.__repr__()
+# print()
 
 #######################
 
