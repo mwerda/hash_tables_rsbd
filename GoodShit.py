@@ -94,7 +94,8 @@ class GoodShit:
                 elif r >= 2 * m:
                     approx = m
 
-                winner_relation['VAL', 'A'] = approx
+                winner_relation['VAL', 'A'] = get_sf(winner_left, winner_variable, sigmas) * get_val(self.relations, winner_right,
+                                                                           winner_variable)
 
                 n = temp_cardinal
                 m = winner_relation['VAL', 'B']
