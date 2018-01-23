@@ -1,5 +1,6 @@
 from prettytable import PrettyTable
 
+
 class HashTable:
     def __init__(self, row_identifiers, column_identifiers):
         self.row_identifiers = row_identifiers
@@ -8,7 +9,6 @@ class HashTable:
 
         for row_name in row_identifiers:
             self.table[row_name] = {}
-
 
     def populate(self, data):
         for values_list, row_name in zip(data, self.row_identifiers):
