@@ -10,11 +10,8 @@ def get_val(relations_list, relation, variable):
     return relations_list[relation]['VAL', variable]
 
 class Relation:
-    def __init__(self, id, cardinal):
-        self.relation_table_schema = {
-            'rows_identifiers': ['SIZE', 'VAL'],
-            'columns_identifiers': ['Property', 'A', 'B']
-        }
+    def __init__(self, id, cardinal, relation_table_schema):
+        self.relation_table_schema = relation_table_schema
         self.id = id
         self.table = {}
         self.cardinal = cardinal
@@ -70,22 +67,34 @@ class HashTable:
         return self.table[row][col]
 
 
-R1 = Relation('R1', 1000)
+R1 = Relation('R1', 1000, {
+            'rows_identifiers': ['SIZE', 'VAL'],
+            'columns_identifiers': ['Property', 'A', 'B']
+        })
 R1.populate_table([[4, 4], [200, 50]])
 #R1.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 200, 50]])
 # R1.__repr__()
 
-R2 = Relation('R2', 1000)
+R2 = Relation('R2', 1000, {
+            'rows_identifiers': ['SIZE', 'VAL'],
+            'columns_identifiers': ['Property', 'A', 'B']
+        })
 R2.populate_table([[4, 4], [40, 100]])
 #R2.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 40, 100]])
 # R2.__repr__()
 
-R3 = Relation('R3', 2000)
+R3 = Relation('R3', 2000, {
+            'rows_identifiers': ['SIZE', 'VAL'],
+            'columns_identifiers': ['Property', 'B', 'D']
+        })
 R3.populate_table([[4, 4], [400, 100]])
 #R3.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 400, 100]])
 # R3.__repr__()
 
-R4 = Relation('R4', 1000)
+R4 = Relation('R4', 1000, {
+            'rows_identifiers': ['SIZE', 'VAL'],
+            'columns_identifiers': ['Property', 'B', 'E']
+        })
 R4.populate_table([[4, 4], [200, 50]])
 #R4.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 200, 50]])
 # R4.__repr__()
@@ -114,16 +123,17 @@ for attribute in in_attributes:
     relations[rel_id][attribute, 'SF'] = relations[rel_id]['VAL', rel_field] / in_domains[rel_field]
 factors.populate(factors_to_populate)
 print(factors)
-sf_table = factors
+sigmas = factors
 
-in_semi_joins_codes = ['R1 A R2',
+in_semi_joins_codes = \
+                ['R1 A R2',
                  'R2 A R1',
                  'R2 B R3',
                  'R3 B R2',
-                 'R2 B R4',
-                 'R4 B R2',
                  'R3 B R4',
-                 'R4 B R3']
+                 'R4 B R3',
+                 'R2 B R4',
+                 'R4 B R2']
 
 semi_joins = HashTable(in_semi_joins_codes, ['Join', 'KOSZT', 'EFEKT', 'ZYSK'])
 semi_joins_rows = []
@@ -133,7 +143,7 @@ for element in in_semi_joins_codes:
     variable = element.split(' ')[1]
 
     koszt = get_size(relations, rel_right, variable) * get_val(relations, rel_right, variable)
-    efekt = get_sf(rel_right, variable, sf_table) * relations[rel_left].cardinal
+    efekt = get_sf(rel_right, variable, sigmas) * relations[rel_left].cardinal
     zysk = relations[rel_left].cardinal - efekt
 
     semi_joins_rows.append([koszt, efekt, zysk])
