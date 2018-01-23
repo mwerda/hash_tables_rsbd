@@ -3,7 +3,11 @@ from prettytable import PrettyTable
 def get_size(relations_list, relation, variable):
     return relations_list[relation]['SIZE', variable]
 
-def get_
+def get_sf(relation, variable, sf_table):
+    return sf_table[relation + '.' + variable, 'SF']
+
+def get_val(relations_list, relation, variable):
+    return relations_list[relation]['VAL', variable]
 
 class Relation:
     def __init__(self, id, cardinal):
@@ -61,6 +65,9 @@ class HashTable:
             pretty_table.add_row(row)
         return str(pretty_table)
 
+    def __getitem__(self, item):
+        row, col = item
+        return self.table[row][col]
 
 
 R1 = Relation('R1', 1000)
@@ -107,6 +114,7 @@ for attribute in in_attributes:
     relations[rel_id][attribute, 'SF'] = relations[rel_id]['VAL', rel_field] / in_domains[rel_field]
 factors.populate(factors_to_populate)
 print(factors)
+sf_table = factors
 
 in_semi_joins_codes = ['R1 A R2',
                  'R2 A R1',
@@ -124,8 +132,14 @@ for element in in_semi_joins_codes:
     rel_right = element.split(' ')[2]
     variable = element.split(' ')[1]
 
-    koszt = get_size(relations, rel_right, variable) * relations[rel_right].cardinal
-    efekt
+    koszt = get_size(relations, rel_right, variable) * get_val(relations, rel_right, variable)
+    efekt = get_sf(rel_right, variable, sf_table) * relations[rel_left].cardinal
+    zysk = relations[rel_left].cardinal - efekt
+
+    semi_joins_rows.append([koszt, efekt, zysk])
+
+semi_joins.populate(semi_joins_rows)
+print(semi_joins)
 
 
 
