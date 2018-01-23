@@ -1,6 +1,10 @@
 import copy
 from prettytable import PrettyTable
 
+from GoodShit import GoodShit
+from Relation import Relation
+
+
 def get_size(relations_list, relation, variable):
     return relations_list[relation]['SIZE', variable]
 
@@ -120,7 +124,7 @@ in_semi_joins_codes = \
                  'R2 B R4',
                  'R4 B R2']
 
-nogos = []
+excluded_indexes = []
 while True:
     factors = HashTable(in_attributes, ['Atrybut', 'SF'])
     factors_to_populate = []
@@ -143,7 +147,7 @@ while True:
 
         koszt = get_size(relations, rel_right, variable) * get_val(relations, rel_right, variable)
         efekt = get_sf(rel_right, variable, sigmas) * relations[rel_left].cardinal
-        if i in nogos:
+        if i in excluded_indexes:
             efekt = relations[rel_left].cardinal
         zysk = relations[rel_left].cardinal - efekt
 
@@ -154,7 +158,7 @@ while True:
 
 
     nullified = int(input())
-    nogos.append(nullified)
+    excluded_indexes.append(nullified)
     winner__full_code = in_semi_joins_codes[nullified]
     winner_left = winner__full_code.split(' ')[0]
     winner_right = winner__full_code.split(' ')[2]
@@ -181,21 +185,59 @@ while True:
         in_semi_joins_codes[i] = element.replace(winner_left, winner_left + 'I')
 
     print()
-#######################
 
-# table = {}
-# rows = ['SIZE', 'VAL']
-# columns = ['Property', 'A', 'B']
-# data = [
-#     [4, 4],
-#     [40, 100]
-# ]
-# hash_table = HashTable(rows, columns)
-# hash_table.populate(data)
-# hash_table.__repr__()
-# print()
 
-#######################
+# R1 = Relation('R1', 1000, {
+#             'rows_identifiers': ['SIZE', 'VAL'],
+#             'columns_identifiers': ['Property', 'A', 'B']
+#         })
+# R1.populate_table([[4, 4], [200, 50]])
+#
+# R2 = Relation('R2', 1000, {
+#             'rows_identifiers': ['SIZE', 'VAL'],
+#             'columns_identifiers': ['Property', 'A', 'B']
+#         })
+# R2.populate_table([[4, 4], [40, 100]])
+#
+# R3 = Relation('R3', 2000, {
+#             'rows_identifiers': ['SIZE', 'VAL'],
+#             'columns_identifiers': ['Property', 'B', 'D']
+#         })
+# R3.populate_table([[4, 4], [400, 100]])
+#
+# R4 = Relation('R4', 1000, {
+#             'rows_identifiers': ['SIZE', 'VAL'],
+#             'columns_identifiers': ['Property', 'B', 'E']
+#         })
+# R4.populate_table([[4, 4], [200, 50]])
+#
+# relations = {
+#     'R1': R1,
+#     'R2': R2,
+#     'R3': R3,
+#     'R4': R4
+# }
+#
+# domains = {
+#     'A': 400,
+#     'B': 500
+# }
+#
+# sigma_attributes = ['R1.A', 'R2.A', 'R2.B', 'R3.B', 'R4.B']
+#
+#
+# semi_joins = \
+#                 ['R1 A R2',
+#                  'R2 A R1',
+#                  'R2 B R3',
+#                  'R3 B R2',
+#                  'R3 B R4',
+#                  'R4 B R3',
+#                  'R2 B R4',
+#                  'R4 B R2']
+#
+# good = GoodShit(relations, domains, sigma_attributes, semi_joins)
+# good.loop_iterations(5)
 
 
 
