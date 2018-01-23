@@ -1,3 +1,4 @@
+import copy
 from prettytable import PrettyTable
 
 def get_size(relations_list, relation, variable):
@@ -13,7 +14,6 @@ class Relation:
     def __init__(self, id, cardinal, relation_table_schema):
         self.relation_table_schema = relation_table_schema
         self.id = id
-        self.table = {}
         self.cardinal = cardinal
         self.hash_table = HashTable(self.relation_table_schema['rows_identifiers'],
                                self.relation_table_schema['columns_identifiers'])
@@ -31,7 +31,8 @@ class Relation:
         return self.hash_table.table[row][col]
 
     def __setitem__(self, key, value):
-        self.hash_table.table[key] = value
+        row, col = key
+        self.hash_table.table[row][col] = value
 
     def __str__(self):
         return str(self.id + '\n' + self.hash_table.__str__() + '\n')
@@ -66,38 +67,33 @@ class HashTable:
         row, col = item
         return self.table[row][col]
 
+    def __setitem__(self, key, value):
+        self.table[key] = value
+
 
 R1 = Relation('R1', 1000, {
             'rows_identifiers': ['SIZE', 'VAL'],
             'columns_identifiers': ['Property', 'A', 'B']
         })
 R1.populate_table([[4, 4], [200, 50]])
-#R1.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 200, 50]])
-# R1.__repr__()
 
 R2 = Relation('R2', 1000, {
             'rows_identifiers': ['SIZE', 'VAL'],
             'columns_identifiers': ['Property', 'A', 'B']
         })
 R2.populate_table([[4, 4], [40, 100]])
-#R2.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 40, 100]])
-# R2.__repr__()
 
 R3 = Relation('R3', 2000, {
             'rows_identifiers': ['SIZE', 'VAL'],
             'columns_identifiers': ['Property', 'B', 'D']
         })
 R3.populate_table([[4, 4], [400, 100]])
-#R3.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 400, 100]])
-# R3.__repr__()
 
 R4 = Relation('R4', 1000, {
             'rows_identifiers': ['SIZE', 'VAL'],
             'columns_identifiers': ['Property', 'B', 'E']
         })
 R4.populate_table([[4, 4], [200, 50]])
-#R4.build_table(['Property', 'A', 'B'], [['SIZE', 4, 4], ['VAL', 200, 50]])
-# R4.__repr__()
 
 relations = {
     'R1': R1,
@@ -112,18 +108,7 @@ in_domains = {
 }
 
 in_attributes = ['R1.A', 'R2.A', 'R2.B', 'R3.B', 'R4.B']
-factors = HashTable(in_attributes, ['Atrybut', 'SF'])
 
-factors_to_populate = []
-for attribute in in_attributes:
-    rel_id = attribute.split('.')[0]
-    rel_field = attribute.split('.')[1]
-    factors_to_populate.append([relations[rel_id]['VAL', rel_field] / in_domains[rel_field]])
-
-    relations[rel_id][attribute, 'SF'] = relations[rel_id]['VAL', rel_field] / in_domains[rel_field]
-factors.populate(factors_to_populate)
-print(factors)
-sigmas = factors
 
 in_semi_joins_codes = \
                 ['R1 A R2',
@@ -135,24 +120,67 @@ in_semi_joins_codes = \
                  'R2 B R4',
                  'R4 B R2']
 
-semi_joins = HashTable(in_semi_joins_codes, ['Join', 'KOSZT', 'EFEKT', 'ZYSK'])
-semi_joins_rows = []
-for element in in_semi_joins_codes:
-    rel_left = element.split(' ')[0]
-    rel_right = element.split(' ')[2]
-    variable = element.split(' ')[1]
+nogos = []
+while True:
+    factors = HashTable(in_attributes, ['Atrybut', 'SF'])
+    factors_to_populate = []
+    for attribute in in_attributes:
+        rel_id = attribute.split('.')[0]
+        rel_field = attribute.split('.')[1]
+        factors_to_populate.append([relations[rel_id]['VAL', rel_field] / in_domains[rel_field]])
 
-    koszt = get_size(relations, rel_right, variable) * get_val(relations, rel_right, variable)
-    efekt = get_sf(rel_right, variable, sigmas) * relations[rel_left].cardinal
-    zysk = relations[rel_left].cardinal - efekt
+        # relations[rel_id][attribute, 'SF'] = relations[rel_id]['VAL', rel_field] / in_domains[rel_field]
+    factors.populate(factors_to_populate)
+    print(factors)
+    sigmas = factors
 
-    semi_joins_rows.append([koszt, efekt, zysk])
+    semi_joins = HashTable(in_semi_joins_codes, ['Join', 'KOSZT', 'EFEKT', 'ZYSK'])
+    semi_joins_rows = []
+    for i, element in enumerate(in_semi_joins_codes):
+        rel_left = element.split(' ')[0]
+        rel_right = element.split(' ')[2]
+        variable = element.split(' ')[1]
 
-semi_joins.populate(semi_joins_rows)
-print(semi_joins)
+        koszt = get_size(relations, rel_right, variable) * get_val(relations, rel_right, variable)
+        efekt = get_sf(rel_right, variable, sigmas) * relations[rel_left].cardinal
+        if i in nogos:
+            efekt = relations[rel_left].cardinal
+        zysk = relations[rel_left].cardinal - efekt
+
+        semi_joins_rows.append([koszt, efekt, zysk])
+
+    semi_joins.populate(semi_joins_rows)
+    print(semi_joins)
 
 
+    nullified = int(input())
+    nogos.append(nullified)
+    winner__full_code = in_semi_joins_codes[nullified]
+    winner_left = winner__full_code.split(' ')[0]
+    winner_right = winner__full_code.split(' ')[2]
+    winner_variable = winner__full_code.split(' ')[1]
 
+    winner_relation = copy.copy(relations[winner_left])
+
+    print(winner__full_code + ' -> ' + winner__full_code.split(' ')[0] + 'I')
+    winner_relation.cardinal = semi_joins[winner__full_code, 'EFEKT']
+    temp = get_sf(winner_left, winner_variable, sigmas) * get_val(relations, winner_right, winner_variable)
+    winner_relation['VAL', winner_variable] = \
+        get_sf(winner_left, winner_variable, sigmas) * get_val(relations, winner_right, winner_variable)
+
+    new_sigma = winner_relation.hash_table.table['VAL'][winner_variable] / in_domains[winner_variable]
+    # del(sigmas[winner_left + '.' + winner_variable, 'SF'])
+    # sigmas[winner_left + '.' + winner_variable, 'SF'] = new_sigma
+
+
+    relations[winner_left + 'I'] = winner_relation
+    for i, element in enumerate(in_attributes):
+        in_attributes[i] = element.replace(winner_left, winner_left + 'I')
+
+    for i, element in enumerate(in_semi_joins_codes):
+        in_semi_joins_codes[i] = element.replace(winner_left, winner_left + 'I')
+
+    print()
 #######################
 
 # table = {}
@@ -168,7 +196,6 @@ print(semi_joins)
 # print()
 
 #######################
-
 
 
 
